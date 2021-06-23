@@ -1,0 +1,170 @@
+scalar DateTime
+
+# Main Types - Query Mutation Subscription
+type Query {
+  getMe: User!
+  getAllTours: [Tour!]!
+  getTour(id: String!): Tour!
+}
+
+type Mutation {
+  # AUTH
+  signup(data: SignupInput!): LoginSignupPayload!
+  login(data: LoginInput!): LoginSignupPayload!
+  forgotPassword(email: String!): Boolean!
+  resetPassword(data: ResetPasswordInput!): Boolean!
+  changePassword(data: ChangePasswordInput!): Boolean!
+  updateMe(data: UpdateMeInput!): User!
+  deleteUser(id: String!): Boolean!
+  # TOURS
+  createTour(data: CreateTourInput!): Tour!
+  # REVIEWS
+  createReview(data: CreateReviewInput!): Review!
+}
+
+# Custom Types
+type User {
+  id: String!
+  name: String!
+  email: String!
+  photo: String!
+  role: Role!
+  reviews: [Review!]!
+  guidedTours: [Tour!]!
+}
+
+type Tour {
+  id: String!
+  name: String!
+  slug: String!
+  price: Float!
+  priceDiscount: Float!
+  duration: Int!
+  maxGroupSize: Int!
+  difficulty: Difficulty!
+  ratingsAvarage: Float!
+  ratingsQuantity: Int!
+  summary: String!
+  description: String!
+  imageCover: String!
+  images: [String!]!
+  startLocation: StartLocation!
+  locations: [Location!]!
+  guides: [User!]!
+  reviews: [Review!]!
+  startDates: [DateTime!]!
+}
+
+type Review {
+  id: String!
+  review: String!
+  rating: Int!
+  createdAt: DateTime!
+  tour: Tour!
+  tourId: String!
+  user: User!
+  userId: String!
+}
+
+type StartLocation {
+  type: String!
+  coordinates: [Float!]!
+  address: String!
+  description: String!
+}
+
+type Location {
+  type: String!
+  coordinates: [Float!]!
+  description: String!
+  day: Int!
+}
+
+type LoginSignupPayload {
+  token: String!
+  user: User!
+}
+
+# Inputs
+input SignupInput {
+  name: String!
+  email: String!
+  photo: String
+  password: String!
+  passwordConfirm: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input ResetPasswordInput {
+  resetToken: String!
+  password: String!
+  passwordConfirm: String!
+}
+
+input ChangePasswordInput {
+  passwordCurrent: String!
+  password: String!
+  passwordConfirm: String!
+}
+
+input UpdateMeInput {
+  name: String
+  email: String
+  photo: String
+}
+
+input CreateTourInput {
+  name: String!
+  price: Float!
+  priceDiscount: Float
+  duration: Int!
+  maxGroupSize: Int!
+  difficulty: Difficulty!
+  summary: String!
+  description: String!
+  startLocation: StartLocationInput!
+  locations: [LocationInput!]!
+  startDates: [DateTime!]!
+  secret: Boolean
+  imageCover: String
+  images: [String!]!
+  guides: [String!]!
+}
+
+input StartLocationInput {
+  type: String!
+  coordinates: [Float!]!
+  address: String!
+  description: String!
+}
+
+input LocationInput {
+  type: String!
+  coordinates: [Float!]!
+  description: String!
+  day: Int!
+}
+
+input CreateReviewInput {
+  review: String!
+  rating: Int!
+  tourId: String!
+  userId: String!
+}
+
+enum Role {
+  admin
+  user
+  guide
+  lead_guide
+}
+
+enum Difficulty {
+  easy
+  medium
+  difficult
+}

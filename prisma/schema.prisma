@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Enums
+enum Role {
+  user
+  guide
+  lead_guide
+  admin
+}
+
+enum Difficulty {
+  easy
+  medium
+  difficult
+}
+
+
+// Main models
+model User {
+  id                           String                @id @default(cuid())
+  name                         String
+  email                        String                @unique
+  photo                        String                @default("default.png")
+  role                         Role                  @default(user)
+  password                     String
+  passwordChangeDate           DateTime?
+  passwordResetToken           String?
+  passwordResetTokenExpires    DateTime?
+  active                       Boolean               @default(true)
+  guidedTours                  Tour[]
+  reviews                      Review[]
+}
+
+
+model Tour {
+  id               String           @id @default(cuid())
+  name             String           @unique @db.VarChar(40)
+  slug             String           @unique
+  price            Float          
+  priceDiscount    Float?           @default(0)
+  duration         Int
+  maxGroupSize     Int
+  difficulty       Difficulty
+  ratingsAvarage   Float            @default(4.5)
+  ratingsQuantity  Int              @default(0)
+  summary          String
+  description      String
+  imageCover       String           @default("default.png")
+  images           String[]
+  startLocation    Json
+  locations        Json[]
+  guides           User[]
+  reviews          Review[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  startDates       DateTime[]
+  secret           Boolean          @default(false)
+}
+
+
+model Review {
+  id               String           @id @default(cuid())
+  review           String
+  rating           Int
+  createdAt        DateTime         @default(now())
+  tour             Tour             @relation(fields: [tourId], references: [id])
+  tourId           String
+  user             User             @relation(fields: [userId], references: [id])
+  userId           String
+  @@unique([tourId, userId])
+}
